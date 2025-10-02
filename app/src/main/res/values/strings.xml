@@ -1,0 +1,52 @@
+<resources>
+    <string name="app_name">MyRuns2</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="inputType">Input Type</string>
+    <string name="activityType">Activity Type</string>
+    <string name="start">Start</string>
+    <string name="accountPreferences">Account Preferences</string>
+    <string name="additionalSettings">Additional Settings</string>
+    <string name="misc">Misc.</string>
+    <string name="name_email_class_etc">Name, Email, Class, etc</string>
+    <string name="userProfile">User Profile</string>
+    <string name="selectTheUnits">Select the units</string>
+    <string name="unitPreference">Unit Preference</string>
+    <string name="posting_your_records_anonymously">Posting your records anonymously</string>
+    <string name="privacy_setting">Privacy setting</string>
+    <string name="comments">Comments</string>
+    <string name="please_enter_your_comments">Please enter your comments</string>
+    <string name="webpage">Webpage</string>
+    <string name="https_www_sfu_ca_computing_html">https://www.sfu.ca/computing.html</string>
+
+
+    <string name="Profile_Photo">Profile Photo</string>
+    <string name="Change">CHANGE</string>
+    <string name="Name">Name</string>
+    <string name="Name_hint">Your Name</string>
+    <string name="Email">Email</string>
+    <string name="Email_hint">Your Email</string>
+    <string name="Phone">Phone</string>
+    <string name="Phone_hint">Your Phone Number</string>
+    <string name="Gender">Gender</string>
+    <string name="Female">Female</string>
+    <string name="Male">Male</string>
+    <string name="Class">Class</string>
+    <string name="Class_hint">eg. 2012</string>
+    <string name="Major">Major</string>
+    <string name="Major_hint">Your Major</string>
+    <string name="Save">Save</string>
+    <string name="Cancel">Cancel</string>
+    <string name="MyRuns1">MyRuns 1</string>
+    <string name="myruns2">MyRuns2</string>
+    <string name="date">Date</string>
+    <string name="duration">Duration</string>
+    <string name="distance">Distance</string>
+    <string name="calories">Calories</string>
+    <string name="heart_rate">Heart Rate</string>
+    <string name="comment">Comment</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="how_did_it_go_notes_here">How did it go? Notes here</string>
+    <string name="open_camera">Open Camera</string>
+    <string name="select_from_gallery">Select from Gallery</string>
+</resources>

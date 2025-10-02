@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="Account Preferences">
+    <Preference
+        android:key="userProfile"
+        android:title="Name, Email, Class, etc"
+        android:summary="User Profile"
+        />
+        <Preference
+            android:layout="@layout/preference_divider" />
+    <CheckBoxPreference
+
+        android:key="privacySetting"
+        android:title="Privacy Setting"
+        android:defaultValue="false"
+        android:summary="Posting your records anonymously"
+        />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Additional Settings">
+<!--        <Preference-->
+<!--            android:key="unitPreference"-->
+<!--            android:title="Unit Preference"-->
+<!--            android:summary="Select the Units"-->
+<!--            />-->
+        <ListPreference
+            android:key="unitPreference"
+            android:title="Unit Preference"
+            android:summary="Select the Units"
+            android:entries="@array/unitOptions"
+            android:entryValues="@array/unitValues"
+            android:defaultValue="0"/>
+        <Preference
+            android:layout="@layout/preference_divider"/>
+<!--        <Preference-->
+<!--            android:key="comments"-->
+<!--            android:title="Comments"-->
+<!--            android:summary="Please enter your comments"-->
+<!--            />-->
+        <EditTextPreference
+            android:key="userComment"
+            android:title="Comments"
+            android:summary="Please enter your comments"
+            android:dialogTitle="Comments"
+            android:defaultValue=""
+            />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Misc.">
+        <Preference
+            android:key="webpage"
+            android:title="Webpage"
+            android:summary="@string/https_www_sfu_ca_computing_html"/>
+        <Preference
+            android:layout="@layout/preference_divider"/>
+    </PreferenceCategory>
+</androidx.preference.PreferenceScreen>
