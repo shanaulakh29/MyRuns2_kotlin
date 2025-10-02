@@ -1,4 +1,4 @@
-package com.example.myruns2
+package com.example.gurshan_aulakh_301608359
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,6 +10,8 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
 
+//myruns2 instructions mention to use spinner so i understood how to sue spinner from the kotlin official site
+//https://developer.android.com/develop/ui/views/components/spinner
 class StartFragment : Fragment() {
     private lateinit var inputTypeSpinner: Spinner
     private lateinit var startButton: Button

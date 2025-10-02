@@ -1,23 +1,15 @@
-package com.example.myruns2
+package com.example.gurshan_aulakh_301608359
 
-import android.app.Activity
-import android.content.Intent
-import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.provider.MediaStore
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import com.example.myruns2.MyViewModel
-import java.io.File
 
+
+//Got idea about how to show dialogs from the lecture slides
 class ManualInputActivity: AppCompatActivity() {
     private lateinit var saveButton: Button
     private lateinit var cancelButton: Button
@@ -31,6 +23,7 @@ class ManualInputActivity: AppCompatActivity() {
 
         saveButton = findViewById<Button>(R.id.saveButton)
         cancelButton = findViewById<Button>(R.id.cancelButton)
+        //Got idea from lecture notes about how to use listview and how to set up the listview adapter
         listview = findViewById<ListView>(R.id.listview)
         val adapter = ArrayAdapter<String>(this, R.layout.list_items, R.id.textview, items )
         listview.adapter = adapter

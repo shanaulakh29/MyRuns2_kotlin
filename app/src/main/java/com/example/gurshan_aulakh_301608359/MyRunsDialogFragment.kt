@@ -1,4 +1,4 @@
-package com.example.myruns2
+package com.example.gurshan_aulakh_301608359
 
 import android.app.Dialog
 import android.content.DialogInterface
@@ -29,6 +29,8 @@ class MyRunsDialogFragment : DialogFragment(), DialogInterface.OnClickListener {
         const val COMMENT_DIALOG= 7
         const val CAMERA_OR_FROM_GALLERY=8
     }
+
+    //Understood from the live lecture demo about how to use AlertDialog.Builder to set up the dialog object
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = AlertDialog.Builder(requireActivity())
         val bundle = arguments

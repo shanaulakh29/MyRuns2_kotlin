@@ -1,4 +1,4 @@
-package com.example.myruns2
+package com.example.gurshan_aulakh_301608359
 
 import android.Manifest
 import android.app.Activity
@@ -11,6 +11,7 @@ import android.net.Uri
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
+// got and understood from the lecture 2 source code
 object Util {
     fun checkPermissions(activity: Activity?) {
 

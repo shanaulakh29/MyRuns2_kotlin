@@ -1,6 +1,5 @@
-package com.example.myruns2.ui.theme
+package com.example.gurshan_aulakh_301608359.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
