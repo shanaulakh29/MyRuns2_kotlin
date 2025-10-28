@@ -43,7 +43,12 @@ class MyRunsDialogFragment : DialogFragment(), DialogInterface.OnClickListener {
             return DatePickerDialog(
                 requireContext(),
                 { _, selectedYear, selectedMonth, selectedDay ->
-                    // Handle the selected date here
+                    val result = Bundle().apply {
+                        putInt("year", selectedYear)
+                        putInt("month", selectedMonth)
+                        putInt("day", selectedDay)
+                    }
+                    parentFragmentManager.setFragmentResult("dateSelected", result)
                 },
                 year, month, day
             )
@@ -55,33 +60,73 @@ class MyRunsDialogFragment : DialogFragment(), DialogInterface.OnClickListener {
             return TimePickerDialog(
                 requireContext(),
                 { _, selectedHour, selectedMinute ->
-                    // Handle the selected time here
+                    val result = Bundle().apply {
+                        putInt("hour", selectedHour)
+                        putInt("minute", selectedMinute)
+                    }
+                    parentFragmentManager.setFragmentResult("timeSelected", result)
                 },
-                hour, minute, true // last parameter = 24-hour format
+                hour, minute, false// last parameter = 24-hour format
             )
         }else if(dialogId==DURATION_DIALOG){
             val view: View = requireActivity().layoutInflater.inflate(R.layout.duration_dialog, null)
+            val editText = view.findViewById<EditText>(R.id.durationEditText)
             builder.setView(view)
             builder.setTitle("Duration")
-            builder.setPositiveButton("ok", this)
+
+            builder.setPositiveButton("ok", {dialog, _ ->
+                val enteredDuration = editText.text.toString()
+                val result = Bundle().apply{
+                    putString("duration",enteredDuration)
+                }
+                parentFragmentManager.setFragmentResult("durationSelected", result)
+            })
+
             builder.setNegativeButton("cancel", this)
         }else if(dialogId==DISTANCE_DIALOG){
             val view: View = requireActivity().layoutInflater.inflate(R.layout.distance_dialog, null)
+            val editText = view.findViewById<EditText>(R.id.distanceEditText)
             builder.setView(view)
             builder.setTitle("Distance")
-            builder.setPositiveButton("ok", this)
+
+            builder.setPositiveButton("ok", {dialog, _ ->
+                val enteredDistance = editText.text.toString()
+                val result = Bundle().apply{
+                    putString("distance",enteredDistance)
+                }
+                parentFragmentManager.setFragmentResult("distanceSelected", result)
+            })
+
             builder.setNegativeButton("cancel", this)
         }else if(dialogId==CALORIES_DIALOG){
             val view: View = requireActivity().layoutInflater.inflate(R.layout.calories_dialog, null)
+            val editText = view.findViewById<EditText>(R.id.caloriesEditText)
             builder.setView(view)
             builder.setTitle("Calories")
-            builder.setPositiveButton("ok", this)
+
+            builder.setPositiveButton("ok", {dialog, _ ->
+                val enteredCalories = editText.text.toString()
+                val result = Bundle().apply{
+                    putString("calories",enteredCalories)
+                }
+                parentFragmentManager.setFragmentResult("caloriesSelected", result)
+            })
+
             builder.setNegativeButton("cancel", this)
         }else if(dialogId==HEART_RATE_DIALOG){
             val view: View = requireActivity().layoutInflater.inflate(R.layout.heartrate_dialog, null)
+            val editText = view.findViewById<EditText>(R.id.heartrateEditText)
             builder.setView(view)
             builder.setTitle("Heart Rate")
-            builder.setPositiveButton("ok", this)
+
+            builder.setPositiveButton("ok", {dialog, _ ->
+                val enteredHeartRate = editText.text.toString()
+                val result = Bundle().apply{
+                    putString("heartRate",enteredHeartRate)
+                }
+                parentFragmentManager.setFragmentResult("heartRateSelected", result)
+            })
+
             builder.setNegativeButton("cancel", this)
         }else if(dialogId==COMMENT_DIALOG){
             val view: View = requireActivity().layoutInflater.inflate(R.layout.comments_dialog, null)
@@ -89,7 +134,15 @@ class MyRunsDialogFragment : DialogFragment(), DialogInterface.OnClickListener {
             editText.hint = "How did it go? Notes here"
             builder.setView(view)
             builder.setTitle("Comment")
-            builder.setPositiveButton("ok", this)
+
+            builder.setPositiveButton("ok", {dialog, _ ->
+                val enteredComment = editText.text.toString()
+                val result = Bundle().apply{
+                    putString("comment",enteredComment)
+                }
+                parentFragmentManager.setFragmentResult("commentSelected", result)
+            })
+
             builder.setNegativeButton("cancel", this)
         }else if(dialogId==CAMERA_OR_FROM_GALLERY){
             val view: View = requireActivity().layoutInflater.inflate(R.layout.camera_or_from_gallery_dialog, null)

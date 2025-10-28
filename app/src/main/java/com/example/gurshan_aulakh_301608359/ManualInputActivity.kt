@@ -7,6 +7,12 @@ import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import com.example.gurshan_aulakh_301608359.database.ExerciseDatabase
+import com.example.gurshan_aulakh_301608359.database.ExerciseDatabaseDao
+import com.example.gurshan_aulakh_301608359.database.ExerciseEntry
+import com.example.gurshan_aulakh_301608359.database.ExerciseRepository
+import java.util.Calendar
 
 
 //Got idea about how to show dialogs from the lecture slides
@@ -14,13 +20,33 @@ class ManualInputActivity: AppCompatActivity() {
     private lateinit var saveButton: Button
     private lateinit var cancelButton: Button
     private lateinit var listview: ListView
+    private lateinit var historyViewModel: HistoryViewModel
+    private lateinit var repository: ExerciseRepository
+    private var calendar: Calendar = Calendar.getInstance()
+
+    private var duration: Double = 0.0
+    private var distance: Double = 0.0
+    private var avgPace: Double = 0.0
+    private var avgSpeed: Double = 0.0
+    private var calories: Double = 0.0
+    private var climb: Double = 0.0
+    private var heartRate: Double = 0.0
+    private var comment: String = ""
+    private lateinit var exercise: ExerciseEntry
+    private lateinit var viewModelFactory: HistoryViewModelFactory
+    private lateinit var database: ExerciseDatabase
+    private lateinit var databaseDao: ExerciseDatabaseDao
     val items = listOf("Date","Time","Duration", "Distance", "Calories", "Heart Rate", "Comment")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_manualinput)
-        val activityType = intent.getStringExtra("activityType")
-
+        val activityType = intent.getIntExtra("activityType",0)
+        database = ExerciseDatabase.getInstance(this)
+        databaseDao = database.exerciseDatabaseDao
+        repository = ExerciseRepository(databaseDao)
+        viewModelFactory = HistoryViewModelFactory(repository)
+        historyViewModel = ViewModelProvider(this,viewModelFactory).get(HistoryViewModel::class.java)
         saveButton = findViewById<Button>(R.id.saveButton)
         cancelButton = findViewById<Button>(R.id.cancelButton)
         //Got idea from lecture notes about how to use listview and how to set up the listview adapter
@@ -52,8 +78,46 @@ class ManualInputActivity: AppCompatActivity() {
             myDialog.arguments=bundle
             myDialog.show(supportFragmentManager, "my dialog")
         }
+        supportFragmentManager.setFragmentResultListener("dateSelected", this) { _, bundle ->
+            val year = bundle.getInt("year")
+            val month = bundle.getInt("month")
+            val day = bundle.getInt("day")
+            calendar.set(Calendar.YEAR, year)
+            calendar.set(Calendar.MONTH, month)
+            calendar.set(Calendar.DAY_OF_MONTH, day)
+
+        }
+
+        supportFragmentManager.setFragmentResultListener("timeSelected", this) { _, bundle ->
+            val hour = bundle.getInt("hour")
+            val minute = bundle.getInt("minute")
+            calendar.set(Calendar.HOUR_OF_DAY,hour)
+            calendar.set(Calendar.MINUTE,minute)
+        }
+
+        supportFragmentManager.setFragmentResultListener("durationSelected", this) { _, bundle ->
+            duration = bundle.getString("duration")?.toDoubleOrNull() ?: 0.0
+        }
+
+        supportFragmentManager.setFragmentResultListener("distanceSelected", this){_, bundle ->
+            distance = bundle.getString("distance")?.toDoubleOrNull() ?: 0.0
+        }
+
+        supportFragmentManager.setFragmentResultListener("caloriesSelected", this) { _, bundle ->
+            calories = bundle.getString("calories")?.toDoubleOrNull() ?: 0.0
+        }
+
+        supportFragmentManager.setFragmentResultListener("heartRateSelected", this) { _, bundle ->
+            heartRate = bundle.getString("heartRate")?.toDoubleOrNull() ?: 0.0
+        }
+
+        supportFragmentManager.setFragmentResultListener("commentSelected", this) { _, bundle ->
+            comment = bundle.getString("comment").toString()
+        }
 
         saveButton.setOnClickListener {
+            exercise = ExerciseEntry(0L,0, activityType, calendar,duration, distance, avgPace, avgSpeed, calories, climb, heartRate, comment)
+            historyViewModel.insert(exercise)
             finish()
         }
         cancelButton.setOnClickListener {

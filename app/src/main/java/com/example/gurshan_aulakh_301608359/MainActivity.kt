@@ -1,5 +1,4 @@
 package com.example.gurshan_aulakh_301608359
-
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -34,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         fragmentsList.add(settingsFragment)
         val viewPagerAdapter = ViewPagerAdapter(this, fragmentsList)
         viewPager2.adapter = viewPagerAdapter
+        viewPager2.offscreenPageLimit=1
 
         val tabConfigurationStrategy = TabLayoutMediator.TabConfigurationStrategy{
                 tab, position -> tab.text = tabTitles[position]

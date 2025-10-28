@@ -37,7 +37,7 @@ class StartFragment : Fragment() {
         startButton = view.findViewById<Button>(R.id.startButton)
         startButton.setOnClickListener {
             val selectedInputType = inputTypeSpinner.selectedItem.toString()
-            val selectedActivityType = activityTypeSpinner.selectedItem.toString()
+            val selectedActivityType = activityTypeSpinner.selectedItemPosition
             if(selectedInputType==inputTypeOptions[0]){
                 val intent = Intent(requireContext(),ManualInputActivity::class.java)
                 intent.putExtra("activityType",selectedActivityType)

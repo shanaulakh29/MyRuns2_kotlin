@@ -32,11 +32,7 @@
             android:defaultValue="0"/>
         <Preference
             android:layout="@layout/preference_divider"/>
-<!--        <Preference-->
-<!--            android:key="comments"-->
-<!--            android:title="Comments"-->
-<!--            android:summary="Please enter your comments"-->
-<!--            />-->
+
         <EditTextPreference
             android:key="userComment"
             android:title="Comments"

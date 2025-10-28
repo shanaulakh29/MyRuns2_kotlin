@@ -33,6 +33,7 @@
         <activity android:name=".UserProfileActivity"/>
         <activity android:name=".ManualInputActivity" />
         <activity android:name=".MapDisplayActivity" />
+        <activity android:name=".ExerciseDetailActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
