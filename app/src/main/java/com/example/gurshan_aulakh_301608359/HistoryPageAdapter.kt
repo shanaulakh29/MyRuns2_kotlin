@@ -13,6 +13,7 @@ import com.example.gurshan_aulakh_301608359.database.ExerciseEntry
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
+import kotlin.math.round
 
 class HistoryPageAdapter(private val context: Context, private var exerciseList: List<ExerciseEntry>):  BaseAdapter(){
     val activityTypeOptions = listOf("Running","Walking", "Standing", "Cycling","Hiking","Downhill Skiing","Cross-Country Skiing", "Snowboarding","Skating","Swimming","Mountain Biking","Wheelchair","Elliptical","Other")
@@ -77,11 +78,17 @@ class HistoryPageAdapter(private val context: Context, private var exerciseList:
         var distance  = exerciseList.get(position).distance
 
         val sharedPrfs = PreferenceManager.getDefaultSharedPreferences(context)
-        val value =  sharedPrfs.getString("unitPreference","0")
+        val unitPrefs =  sharedPrfs.getString("unitPreference","0")
         var distanceUnit = "Miles"
-        if(value=="0"){
+        if(unitPrefs=="0"){
             distanceUnit = "Kilometres"
             distance = distance*1.60934
+        }
+//        distance = String.format("%.2f", distance).toDouble()
+        distance = round(distance * 100) / 100
+        if(distance==0.0){
+            distanceTextView.setText("0 $distanceUnit")
+            return
         }
         distanceTextView.text = "$distance $distanceUnit,"
     }

@@ -1,5 +1,6 @@
 package com.example.gurshan_aulakh_301608359
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -8,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
 import com.example.gurshan_aulakh_301608359.database.ExerciseDatabase
 import com.example.gurshan_aulakh_301608359.database.ExerciseDatabaseDao
 import com.example.gurshan_aulakh_301608359.database.ExerciseEntry
@@ -37,6 +39,7 @@ class ManualInputActivity: AppCompatActivity() {
     private lateinit var database: ExerciseDatabase
     private lateinit var databaseDao: ExerciseDatabaseDao
     val items = listOf("Date","Time","Duration", "Distance", "Calories", "Heart Rate", "Comment")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -101,6 +104,14 @@ class ManualInputActivity: AppCompatActivity() {
 
         supportFragmentManager.setFragmentResultListener("distanceSelected", this){_, bundle ->
             distance = bundle.getString("distance")?.toDoubleOrNull() ?: 0.0
+            if(distance>0.0){
+                val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+                val unitPref = sharedPreferences.getString("unitPreference","0")
+                //storing the distance in miles in database
+                if(unitPref=="0"){//user is entering in kilometres
+                    distance = distance/1.60934
+                }
+            }
         }
 
         supportFragmentManager.setFragmentResultListener("caloriesSelected", this) { _, bundle ->

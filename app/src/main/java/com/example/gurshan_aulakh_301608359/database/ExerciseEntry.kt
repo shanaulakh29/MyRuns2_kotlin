@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.Calendar
-
+//Got idea from lecture notes about how to create database and how to connect the View to the database using repository and viewModel
 @Entity(tableName = "ExerciseEntry_table")
 class ExerciseEntry (
     @PrimaryKey(autoGenerate = true)

@@ -5,7 +5,7 @@
     >
     <fragment
         xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/map"
+        android:id="@+id/map_summary"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,6 +23,7 @@
         android:layout_marginTop="40dp"
         android:layout_marginEnd="20dp"
         />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -60,7 +61,8 @@
             <TextView
                 android:id="@+id/avgSpeedValue"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="0.0" />
         </LinearLayout>
 
         <!-- Current Speed -->
@@ -77,7 +79,8 @@
             <TextView
                 android:id="@+id/curSpeedValue"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="0.0" />
         </LinearLayout>
 
         <!-- Climb -->
@@ -94,7 +97,8 @@
             <TextView
                 android:id="@+id/climbValue"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="0" />
         </LinearLayout>
 
         <!-- Calorie -->
@@ -111,7 +115,8 @@
             <TextView
                 android:id="@+id/calorieValue"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="0.0" />
         </LinearLayout>
 
         <!-- Distance -->
@@ -128,32 +133,8 @@
             <TextView
                 android:id="@+id/distanceValue"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="0.0" />
         </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="bottom"
-        >
-        <Button
-            android:id="@+id/saveButton"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_margin="2dp"
-            android:layout_height="wrap_content"
-            android:text="@string/save"
-
-            />
-        <Button
-            android:id="@+id/cancelButton"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="@string/cancel"
-            android:layout_margin="2dp"
-            />
     </LinearLayout>
 </FrameLayout>

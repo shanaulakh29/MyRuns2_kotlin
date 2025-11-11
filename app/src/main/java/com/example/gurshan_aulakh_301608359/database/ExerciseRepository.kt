@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-
+//Got idea from lecture notes about how to create database and how to connect the View to the database using repository and viewModel
 class ExerciseRepository(private val exerciseDatabaseDao: ExerciseDatabaseDao) {
 
     val allExercises: Flow<List<ExerciseEntry>> = exerciseDatabaseDao.getAllExercises()

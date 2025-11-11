@@ -5,7 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
-
+//Got idea from lecture notes about how to create database and how to connect the View to the database using repository and viewModel
 @Dao
 interface ExerciseDatabaseDao {
 

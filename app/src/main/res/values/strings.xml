@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MyRuns2</string>
+    <string name="app_name">MyRuns3</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="inputType">Input Type</string>
     <string name="activityType">Activity Type</string>
@@ -37,7 +37,7 @@
     <string name="Save">Save</string>
     <string name="Cancel">Cancel</string>
     <string name="MyRuns1">MyRuns 1</string>
-    <string name="myruns2">MyRuns2</string>
+    <string name="myruns2">MyRuns3</string>
     <string name="date">Date</string>
     <string name="duration">Duration</string>
     <string name="distance">Distance</string>
@@ -55,4 +55,10 @@
     <string name="activity_type">Activity Type</string>
     <string name="date_and_time">Date And Time</string>
     <string name="delete">Delete</string>
+    <string name="type">Type: </string>
+    <string name="avg_speed">Avg Speed: </string>
+    <string name="cur_speed">Cur Speed: </string>
+    <string name="climb">Climb: </string>
+    <string name="calorievalue">calorieValue: </string>
+    <string name="distancee">"distance: "</string>
 </resources>

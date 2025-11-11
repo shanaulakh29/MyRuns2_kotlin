@@ -47,20 +47,38 @@ class HistoryFragment : Fragment() {
         })
         listView.setOnItemClickListener { parent, view, position, id ->
             val selectedItem = arrayList[position]
-            val intent = Intent(requireActivity(), ExerciseDetailActivity::class.java)
-            intent.putExtra("inputType", selectedItem.inputType)
-            intent.putExtra("activityType", selectedItem.activityType)
-            intent.putExtra("dateTime",selectedItem.dateTime.timeInMillis)
-            intent.putExtra("duration", selectedItem.duration)
-            intent.putExtra("distance", selectedItem.distance)
-            intent.putExtra("avgPace", selectedItem.avgPace)
-            intent.putExtra("avgSpeed", selectedItem.avgSpeed)
-            intent.putExtra("calorie", selectedItem.calorie)
-            intent.putExtra("climb", selectedItem.climb)
-            intent.putExtra("heartRate", selectedItem.heartRate)
-            intent.putExtra("comment", selectedItem.comment)
-            intent.putExtra("id", selectedItem.id)
-            startActivity(intent)
+            val inputType = selectedItem.inputType
+            if(inputType==0) {
+                val intent = Intent(requireActivity(), ExerciseDetailActivity::class.java)
+                intent.putExtra("inputType", selectedItem.inputType)
+                intent.putExtra("activityType", selectedItem.activityType)
+                intent.putExtra("dateTime", selectedItem.dateTime.timeInMillis)
+                intent.putExtra("duration", selectedItem.duration)
+                intent.putExtra("distance", selectedItem.distance)
+                intent.putExtra("avgPace", selectedItem.avgPace)
+                intent.putExtra("avgSpeed", selectedItem.avgSpeed)
+                intent.putExtra("calorie", selectedItem.calorie)
+                intent.putExtra("climb", selectedItem.climb)
+                intent.putExtra("heartRate", selectedItem.heartRate)
+                intent.putExtra("comment", selectedItem.comment)
+                intent.putExtra("id", selectedItem.id)
+                startActivity(intent)
+            }else{
+                val intent = Intent(requireActivity(), MapDisplayActivity::class.java )
+                intent.putExtra("inputType", selectedItem.inputType)
+                intent.putExtra("activityType", selectedItem.activityType)
+                intent.putExtra("dateTime", selectedItem.dateTime.timeInMillis)
+                intent.putExtra("duration", selectedItem.duration)
+                intent.putExtra("distance", selectedItem.distance)
+                intent.putExtra("avgPace", selectedItem.avgPace)
+                intent.putExtra("avgSpeed", selectedItem.avgSpeed)
+                intent.putExtra("calorie", selectedItem.calorie)
+                intent.putExtra("climb", selectedItem.climb)
+                intent.putExtra("heartRate", selectedItem.heartRate)
+                intent.putExtra("comment", selectedItem.comment)
+                intent.putExtra("id", selectedItem.id)
+                startActivity(intent)
+            }
         }
         return view
     }

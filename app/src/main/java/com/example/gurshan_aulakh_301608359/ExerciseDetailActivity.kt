@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
+import kotlin.math.round
 
 class ExerciseDetailActivity : AppCompatActivity() {
     private lateinit var historyViewModel: HistoryViewModel
@@ -55,20 +56,9 @@ class ExerciseDetailActivity : AppCompatActivity() {
         setActivityType()
         setDateTime()
 
-        val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val value = sharedPreferences.getString("unitPreference","0")
-
-        var distance = intent.getDoubleExtra("distance", 0.0)
-        var distanceUnit="Miles"
-        if(value=="0"){
-            distanceUnit="kms"
-            distance = distance * 1.60934
-            distance = String.format("%.2f", distance).toDouble()
-
-        }
+        setDistance()
         setDuration(durationEditText)
 
-        distanceEditText.setText("$distance $distanceUnit")
 
         val caloriesInt = intent.getDoubleExtra("calorie", 0.0).toInt()
         caloriesEditText.setText("$caloriesInt cals")
@@ -81,7 +71,26 @@ class ExerciseDetailActivity : AppCompatActivity() {
             finish()
         }
     }
+    fun setDistance(){
+        val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val unitPrefs = sharedPreferences.getString("unitPreference","0")
 
+        var distance = intent.getDoubleExtra("distance", 0.0)
+        var distanceUnit = "Miles"
+        if(unitPrefs=="0"){
+            distanceUnit = "Kilometres"
+            distance = distance*1.60934
+        }
+//        distance = String.format("%.2f", distance).toDouble()
+        distance = round(distance * 100) / 100
+        if(distance==0.0){
+            distanceEditText.setText("0 $distanceUnit")
+            distanceEditText.keyListener = null
+            return
+        }
+        distanceEditText.setText("$distance $distanceUnit")
+        distanceEditText.keyListener = null
+    }
     fun setDateTime(){
         val dateTimeMillis= intent.getLongExtra("dateTime",System.currentTimeMillis())
         val calendar = Calendar.getInstance()
