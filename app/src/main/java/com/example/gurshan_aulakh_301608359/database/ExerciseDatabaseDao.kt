@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 //Got idea from lecture notes about how to create database and how to connect the View to the database using repository and viewModel
 @Dao
@@ -17,4 +18,7 @@ interface ExerciseDatabaseDao {
 
     @Query("Select * from exerciseentry_table")
     fun getAllExercises(): Flow<List<ExerciseEntry>>
+
+    @Query("SELECT * FROM ExerciseEntry_table WHERE id = :id")
+    fun getExerciseEntry(id: Long): Flow<ExerciseEntry>
 }

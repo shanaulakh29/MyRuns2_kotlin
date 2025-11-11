@@ -3,6 +3,7 @@ package com.example.gurshan_aulakh_301608359.database
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.android.gms.maps.model.LatLng
 import java.util.Calendar
 //Got idea from lecture notes about how to create database and how to connect the View to the database using repository and viewModel
 @Entity(tableName = "ExerciseEntry_table")
@@ -43,5 +44,6 @@ class ExerciseEntry (
     @ColumnInfo(name = "comment")
     var comment: String,
 
-
+    @ColumnInfo(name="locationList")
+    var locationList:ArrayList<LatLng>
 )

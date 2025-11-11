@@ -65,6 +65,9 @@ class TrackingService : Service(), LocationListener {
             bundle.putDouble("avgSpeed", avgSpeed)
             bundle.putDouble("distance", totalDistance)
             bundle.putDouble("calorie", totalCalorie)
+            bundle.putDouble("longitude_key",location.longitude)
+            bundle.putDouble("latitude_key",location.latitude)
+
             val msg = messageHandler!!.obtainMessage()
             msg.data = bundle
             messageHandler!!.sendMessage(msg)

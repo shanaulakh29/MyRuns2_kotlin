@@ -14,6 +14,7 @@ import com.example.gurshan_aulakh_301608359.database.ExerciseDatabase
 import com.example.gurshan_aulakh_301608359.database.ExerciseDatabaseDao
 import com.example.gurshan_aulakh_301608359.database.ExerciseEntry
 import com.example.gurshan_aulakh_301608359.database.ExerciseRepository
+import com.google.android.gms.maps.model.LatLng
 import java.util.Calendar
 
 
@@ -127,7 +128,8 @@ class ManualInputActivity: AppCompatActivity() {
         }
 
         saveButton.setOnClickListener {
-            exercise = ExerciseEntry(0L,0, activityType, calendar,duration, distance, avgPace, avgSpeed, calories, climb, heartRate, comment)
+            val locationList = ArrayList<LatLng>()
+            exercise = ExerciseEntry(0L,0, activityType, calendar,duration, distance, avgPace, avgSpeed, calories, climb, heartRate, comment,locationList)
             historyViewModel.insert(exercise)
             finish()
         }

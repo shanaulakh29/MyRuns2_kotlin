@@ -1,6 +1,7 @@
 package com.example.gurshan_aulakh_301608359
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
@@ -14,6 +15,9 @@ val allExercisesLiveData: LiveData<List<ExerciseEntry>> = exerciseRepository.all
     }
     fun delete(id: Long){
         exerciseRepository.delete(id)
+    }
+    fun getExerciseEntry(id:Long):LiveData<ExerciseEntry>{
+        return exerciseRepository.getExerciseEntry(id).asLiveData()
     }
 }
 class HistoryViewModelFactory (private val repository: ExerciseRepository) : ViewModelProvider.Factory {

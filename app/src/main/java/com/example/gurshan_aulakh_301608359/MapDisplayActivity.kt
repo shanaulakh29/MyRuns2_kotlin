@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -19,18 +21,25 @@ import com.example.gurshan_aulakh_301608359.database.ExerciseDatabase
 import com.example.gurshan_aulakh_301608359.database.ExerciseDatabaseDao
 import com.example.gurshan_aulakh_301608359.database.ExerciseEntry
 import com.example.gurshan_aulakh_301608359.database.ExerciseRepository
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
 import java.util.Calendar
 
 class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback,
     GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener{
     private var IS_HISTORY_MODE=true
+    private var isMarkersAlreadyShownInHistoryTab=false
+    private var IS_MAP_READY=false
+    private var isStartLocationMarked=false
     private lateinit var serviceIntent: Intent
     private lateinit var mapDisplayActivityViewModel: MapDisplayActivityViewModel
     private var calendar: Calendar = Calendar.getInstance()
+    private lateinit var locationList: ArrayList<LatLng>
     private var duration: Double = 0.0
     private var curSpeed:Double = 0.0
     private var distance: Double = 0.0
@@ -64,6 +73,8 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback,
     private lateinit var typeTextView: TextView
     private lateinit var sharedPreferences: SharedPreferences
     private var unitPref: String? = "0"
+    private var id:Long = -1
+    private lateinit var tempLocationList:ArrayList<LatLng>
 
     private val permissionLauncher =
         registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -85,11 +96,12 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback,
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_mapdisplay)
-        val id = intent.getLongExtra("id",-1)
+
+        id = intent.getLongExtra("id",-1)
         if(id.toInt()==-1){
             IS_HISTORY_MODE=false
         }
-
+        locationList= ArrayList<LatLng>()
         initializeButtons()
 
         inputTypeIndex = intent.getIntExtra("inputType",0)
@@ -106,7 +118,8 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback,
         if(!IS_HISTORY_MODE){
             deleteButton.visibility = View.GONE
             serviceIntent = Intent(this, TrackingService::class.java)
-            mapDisplayActivityViewModel = MapDisplayActivityViewModel()
+            mapDisplayActivityViewModel = ViewModelProvider(this)[MapDisplayActivityViewModel::class.java]
+            tempLocationList = mapDisplayActivityViewModel.tempLocationList.value?: ArrayList()
             askPermissions()
             registerViewModelVariablesToObserve()
 
@@ -127,6 +140,17 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback,
     }
 
     private fun registerViewModelVariablesToObserve() {
+        mapDisplayActivityViewModel.tempLocationList.observe(this) { list ->
+            if(IS_MAP_READY){
+                tempLocationList=list
+                    showTempLocationListMarkers()
+            }
+        }
+        mapDisplayActivityViewModel.curLocation.observe(this){
+                loc->
+            updateCurrentLocationOnMap(loc)
+        }
+
         mapDisplayActivityViewModel.distance.observe(this){
             dist->
             setDistanceTextViewValue(dist)
@@ -145,21 +169,54 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback,
             calorieTextView.text = calorie.toString()
         }
     }
+    private fun showTempLocationListMarkers() {
+        if(tempLocationList.size<=0){
+            return
+        }
+        mMap.clear()
+        val startLatlng = tempLocationList[0]
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startLatlng, 16f))
+        mMap.addMarker(MarkerOptions().position(startLatlng).title("Start Location"))
+        println("TEMPLOCATION_LIST_SIZE IS "+tempLocationList.size)
+        if (tempLocationList.size > 1) {
+            for (i in 1 until tempLocationList.size) {
+                mMap.addMarker(MarkerOptions().position(tempLocationList[i]))
+                val polylineOptions = PolylineOptions()
+                    .add(startLatlng)
+                    .add(tempLocationList[i])
+                    .color(Color.BLUE).width(5f)
+                mMap.addPolyline(polylineOptions)
+            }
+        }
+    }
+
+    private fun updateCurrentLocationOnMap(loc: Location){
+        val latlng = LatLng(loc.latitude,loc.longitude)
+        if(!isStartLocationMarked) {
+            isStartLocationMarked=true
+            mapDisplayActivityViewModel.addTempMarker(latlng)
+        }
+
+    }
 
     private fun registerSaveCancelAndDeleteButtons() {
 
         saveButton.setOnClickListener {
-            exercise = ExerciseEntry(0L,inputTypeIndex, activityTypeIndex, calendar,duration, distance, avgPace, avgSpeed, calories, climb, heartRate, comment)
+            locationList = mapDisplayActivityViewModel.tempLocationList.value ?: ArrayList()
+            exercise = ExerciseEntry(0L,inputTypeIndex, activityTypeIndex, calendar,duration, distance, avgPace, avgSpeed, calories, climb, heartRate, comment, locationList)
             historyViewModel.insert(exercise)
+            applicationContext.unbindService(mapDisplayActivityViewModel)
+            stopService( serviceIntent)
+            mapDisplayActivityViewModel.clearTempMarkers()
             finish()
         }
         cancelButton.setOnClickListener {
             applicationContext.unbindService(mapDisplayActivityViewModel)
             stopService( serviceIntent)
+            mapDisplayActivityViewModel.clearTempMarkers()
             finish()
         }
         deleteButton.setOnClickListener {
-            val id = intent.getLongExtra("id",-1)
             if(id>=0){
                 historyViewModel.delete(id)
             }
@@ -190,25 +247,46 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback,
         viewModelFactory = HistoryViewModelFactory(repository)
         historyViewModel = ViewModelProvider(this,viewModelFactory).get(HistoryViewModel::class.java)
     }
+
     override fun onMapReady(googeMap: GoogleMap) {
-       mMap = googeMap
+        mMap = googeMap
         mMap.mapType= GoogleMap.MAP_TYPE_NORMAL
         mMap.setOnMapClickListener(this)
         mMap.setOnMapLongClickListener(this)
+        IS_MAP_READY=true
+        if(!IS_HISTORY_MODE){
+            showTempLocationListMarkers()
+        }
 
+        if(!isMarkersAlreadyShownInHistoryTab && IS_HISTORY_MODE){
+            showLocationListMarkers()
+        }
     }
 
     override fun onMapClick(p0: LatLng) {
-
+        if (IS_HISTORY_MODE) return
     }
 
-    override fun onMapLongClick(p0: LatLng) {
+    override fun onMapLongClick(latlng: LatLng) {
+        if (IS_HISTORY_MODE) return
+        mapDisplayActivityViewModel.addTempMarker(latlng)
 
     }
 
     private fun initializeVariablesFromDatabase() {
+        if(id>=0){
+            historyViewModel.getExerciseEntry(id).observe(this){ entry->
+                if(entry!=null){
+                locationList = entry.locationList
+                    if(!isMarkersAlreadyShownInHistoryTab){
+                        showLocationListMarkers()
+                    }
+                }else{
+                    locationList= ArrayList<LatLng>()
+                }
+            }
+        }
         typeTextView.text = activityTypeOptions[intent.getIntExtra("activityType", 0)]
-
         setAvgSpeedTextViewValue(intent.getDoubleExtra("avgSpeed", 0.0))
         setCurSpeedTextViewValue(intent.getDoubleExtra("curSpeed", 0.0))
         setDistanceTextViewValue(intent.getDoubleExtra("distance", 0.0))
@@ -219,9 +297,29 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback,
         }
         climbTextView.text = "${intent.getDoubleExtra("climb", 0.0)} ${unit}"
         calorieTextView.text = intent.getDoubleExtra("calorie", 0.0).toString()
-
-
     }
+
+    private fun showLocationListMarkers() {
+        if (locationList.isEmpty() || !IS_MAP_READY) return  // no markers to show
+        println("LOCATIONLIST SIZE IN HISTORY MODE IS"+locationList.size)
+        val startLatlng = locationList[0]
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startLatlng, 16f))
+        mMap.addMarker(MarkerOptions().position(startLatlng).title("Start"))
+
+        if (locationList.size > 1) {
+            val endLatlng = locationList[locationList.size - 1]
+            mMap.addMarker(MarkerOptions().position(endLatlng).title("End"))
+
+            val polylineOptions = PolylineOptions()
+                .add(startLatlng)
+                .add(endLatlng)
+                .color(Color.BLUE)
+                .width(5f)
+            mMap.addPolyline(polylineOptions)
+            isMarkersAlreadyShownInHistoryTab=true
+        }
+    }
+
 
     private fun setAvgSpeedTextViewValue(speedParam:Double) {
         var unit="mph"
@@ -277,3 +375,4 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback,
         unitPref = sharedPreferences.getString("unitPreference","0")
     }
 }
+
