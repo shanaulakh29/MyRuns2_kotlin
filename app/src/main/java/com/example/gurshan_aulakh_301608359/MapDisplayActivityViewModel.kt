@@ -14,6 +14,7 @@ import com.google.android.gms.maps.model.LatLng
 class MapDisplayActivityViewModel: ViewModel(), ServiceConnection {
     var curLocation: MutableLiveData<Location> = MutableLiveData<Location>()
     val curSpeed: MutableLiveData<Double> = MutableLiveData<Double>()
+    val duration: MutableLiveData<Double> = MutableLiveData<Double>()
     val distance:MutableLiveData<Double> = MutableLiveData<Double>()
     val avgSpeed:MutableLiveData<Double> = MutableLiveData<Double>()
     val calorie:MutableLiveData<Double> = MutableLiveData<Double>()
@@ -37,10 +38,11 @@ init{
     inner class MyMessageHandler(looper: Looper): Handler(looper) {
         override fun handleMessage(msg: Message) {
             val bundle = msg.data
-            curSpeed.value = bundle.getDouble("curSpeed")
-            distance.value = bundle.getDouble("distance")
-            avgSpeed.value = bundle.getDouble("avgSpeed")
-            calorie.value = bundle.getDouble("calorie")
+            duration.value = bundle.getDouble("totalTime")
+            curSpeed.value = String.format("%.2f", bundle.getDouble("curSpeed")).toDouble()
+            distance.value = String.format("%.2f", bundle.getDouble("distance")).toDouble()
+            avgSpeed.value = String.format("%.2f", bundle.getDouble("avgSpeed")).toDouble()
+            calorie.value = String.format("%.2f", bundle.getDouble("calorie")).toDouble()
             val lat = bundle.getDouble("latitude_key")
             val longt = bundle.getDouble("longitude_key")
             curLocation.value = Location("").apply{

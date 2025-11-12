@@ -143,7 +143,7 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback,
         mapDisplayActivityViewModel.tempLocationList.observe(this) { list ->
             if(IS_MAP_READY){
                 tempLocationList=list
-                    showTempLocationListMarkers()
+                showTempLocationListMarkers()
             }
         }
         mapDisplayActivityViewModel.curLocation.observe(this){
@@ -167,6 +167,10 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback,
                 calorie->
             calories = calorie
             calorieTextView.text = calorie.toString()
+        }
+        mapDisplayActivityViewModel.duration.observe(this){
+                time->
+            duration = time
         }
     }
     private fun showTempLocationListMarkers() {
@@ -277,7 +281,7 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback,
         if(id>=0){
             historyViewModel.getExerciseEntry(id).observe(this){ entry->
                 if(entry!=null){
-                locationList = entry.locationList
+                    locationList = entry.locationList
                     if(!isMarkersAlreadyShownInHistoryTab){
                         showLocationListMarkers()
                     }
@@ -323,29 +327,34 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback,
 
     private fun setAvgSpeedTextViewValue(speedParam:Double) {
         var unit="mph"
+        var speed = speedParam
         if(unitPref=="0"){
             unit = "km/h"
+            speed = speed*1.60934
         }
-        var speed = speedParam
-        avgSpeed = speedParam
+
+        avgSpeed = speed
         avgSpeedTextView.text = "${speed} ${unit}"
     }
     private fun setCurSpeedTextViewValue(speedParam:Double) {
         var unit="mph"
+        var speed = speedParam
         if(unitPref=="0"){
             unit = "km/h"
+            speed  = speed*1.60934
         }
-        var speed = speedParam
-        curSpeed = speedParam
+        curSpeed = speed
         curSpeedTextView.text = "${speed} ${unit}"
     }
     private fun setDistanceTextViewValue(distParam:Double) {
         var unit="Miles"
+        var dist=distParam
         if(unitPref=="0"){
             unit = "Kilometers"
+            dist=distParam*1.60934
         }
-        var dist=distParam
-        distance = distParam
+
+        distance = dist
         distanceTextView.text = "${dist} ${unit}"
     }
 

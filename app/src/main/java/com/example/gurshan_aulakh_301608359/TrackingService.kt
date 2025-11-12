@@ -22,6 +22,7 @@ class TrackingService : Service(), LocationListener {
     private var curSpeed = 0.0
     private var totalCalorie = 0.0
     private var totalDistance:Double=0.0
+    private var totalTimeInSecs:Double=0.0
     private var prevLocation:Location?=null
     private val NOTIFICATION_ID = 111
     private lateinit var locationManager: LocationManager
@@ -46,33 +47,57 @@ class TrackingService : Service(), LocationListener {
         }
     }
     override fun onLocationChanged(location: Location) {
-        if(prevLocation!=null){
-            totalCalorie+=10
-            curSpeed = location.speed.toDouble()
-            val totalTime = (location.time - startTime) / 1000.0
-            val deltaDistance = prevLocation!!.distanceTo(location)
-            totalDistance+=deltaDistance
-            avgSpeed = if(totalTime>0) totalDistance/totalTime else 0.0
-            prevLocation=location
-        }else{
-            prevLocation=location
-            startTime = location.time
+        if (prevLocation != null) {
+            // Speed in MPH
+            curSpeed = location.speed.toDouble() * 2.23694
+
+            // Time in seconds since start
+            totalTimeInSecs = (System.currentTimeMillis() - startTime) / 1000.0
+
+            // Total distance in miles
+            var deltaDistance = prevLocation!!.distanceTo(location).toDouble() / 1609.344 // meters to miles
+            totalDistance += deltaDistance
+
+            // Average speed in MPH
+            val totalTimeHours = totalTimeInSecs / 3600.0
+            avgSpeed = if (totalTimeHours > 0) totalDistance / totalTimeHours else 0.0
+
+            // Calories burned
+            totalCalorie += deltaDistance * 0.30
+
+            prevLocation = location
+        } else {
+            startTime = System.currentTimeMillis()
+            prevLocation = location
         }
 
-        if(messageHandler!=null){
+        // Only format for display, not for calculations
+        if (messageHandler != null) {
             val bundle = Bundle()
+            bundle.putDouble("totalTime", totalTimeInSecs)
             bundle.putDouble("curSpeed", curSpeed)
             bundle.putDouble("avgSpeed", avgSpeed)
             bundle.putDouble("distance", totalDistance)
             bundle.putDouble("calorie", totalCalorie)
-            bundle.putDouble("longitude_key",location.longitude)
-            bundle.putDouble("latitude_key",location.latitude)
+            bundle.putDouble("longitude_key", location.longitude)
+            bundle.putDouble("latitude_key", location.latitude)
 
             val msg = messageHandler!!.obtainMessage()
             msg.data = bundle
             messageHandler!!.sendMessage(msg)
+
+            // Display nicely
+            println(
+                "totalTimeInSecs = ${"%.2f".format(totalTimeInSecs)}, " +
+                        "curSpeed = ${"%.2f".format(curSpeed)}, " +
+                        "avgSpeed = ${"%.2f".format(avgSpeed)}, " +
+                        "totalDistance = ${"%.2f".format(totalDistance)}, " +
+                        "totalCalorie = ${"%.2f".format(totalCalorie)}, " +
+                        "longitude = ${location.longitude}, latitude = ${location.latitude}"
+            )
         }
     }
+
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         println("debug: Service onStartCommand() called everytime startService() is called; startId: $startId flags: $flags")

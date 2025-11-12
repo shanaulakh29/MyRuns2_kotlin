@@ -68,8 +68,8 @@ class HistoryPageAdapter(private val context: Context, private var exerciseList:
         var duration = exerciseList.get(position).duration
         var durationText="0 secs"
         if(duration!=0.0){
-            val minutes = duration.toInt()
-            val seconds  = ((duration-minutes)*60).toInt()
+            val minutes = duration.toInt() / 60
+            val seconds = (duration.toInt() % 60)
             durationText = "$minutes mins $seconds secs"
         }
         durationTextView.text = durationText
