@@ -37,12 +37,19 @@ class TrackingService : Service(), LocationListener {
         myBinder = MyBinder()
         showNotification()
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-        if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            if(location!=null){
+
+        val hasFine = checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val hasCoarse = checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+        if (hasFine || hasCoarse) {
+            val provider = if (hasFine) LocationManager.GPS_PROVIDER else LocationManager.NETWORK_PROVIDER
+            println("requesting location from "+provider)
+            val location = locationManager.getLastKnownLocation(provider)
+            if (location != null) {
                 onLocationChanged(location)
             }
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, this)
+
+            locationManager.requestLocationUpdates(provider, 0, 0f, this)
         } else {
             println("Location permission missing")
         }

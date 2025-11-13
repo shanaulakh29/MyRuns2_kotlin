@@ -25,6 +25,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -84,14 +85,18 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
     private lateinit var tempLocationList:ArrayList<LatLng>
 
     private val permissionLauncher =
-        registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            val locationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+        registerForActivityResult(
+            androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            val fineGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+            val coarseGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
             val notificationGranted = permissions[Manifest.permission.POST_NOTIFICATIONS] ?: false
 
-            if (locationGranted && notificationGranted) {
+            if ((fineGranted || coarseGranted) && notificationGranted) {
                 startService()
             } else {
                 // Handle denied permissions
+                println("Permissions denied or missing, service not started")
             }
         }
     private fun startService(){
@@ -195,7 +200,8 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
             startMarker = mMap.addMarker(
                 MarkerOptions()
                     .position(startLatlng)
-                    .title("Start Location")
+                    .title("Start Location").icon(
+                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
             )
             hasSetStartLocation = true
             println("START MARKER CREATED AT: $startLatlng")
@@ -204,6 +210,7 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
         // Update current location marker and polyline
         if (tempLocationList.size > 1) {
             val currentLatlng = tempLocationList[tempLocationList.size - 1]
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatlng, 16f))
 
             // Remove old current marker
             currentMarker?.remove()
@@ -350,7 +357,8 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
         println("LOCATIONLIST SIZE IN HISTORY MODE IS"+locationList.size)
         val startLatlng = locationList[0]
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startLatlng, 16f))
-        mMap.addMarker(MarkerOptions().position(startLatlng).title("Start"))
+        mMap.addMarker(MarkerOptions().position(startLatlng).title("Start").icon(
+            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
 
         if (locationList.size > 1) {
             val endLatlng = locationList[locationList.size - 1]
@@ -376,6 +384,7 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
         }
 
         avgSpeed = speed
+        speed = String.format("%.2f", speed).toDouble()
         avgSpeedTextView.text = "${speed} ${unit}"
     }
     private fun setCurSpeedTextViewValue(speedParam:Double) {
@@ -386,6 +395,7 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
             speed  = speed*1.60934
         }
         curSpeed = speed
+        speed = String.format("%.2f", speed).toDouble()
         curSpeedTextView.text = "${speed} ${unit}"
     }
     private fun setDistanceTextViewValue(distParam:Double) {
@@ -397,6 +407,7 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
         }
 
         distance = dist
+        dist = String.format("%.2f", dist).toDouble()
         distanceTextView.text = "${dist} ${unit}"
     }
 
@@ -407,6 +418,11 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             permissionsToRequest.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        // Coarse Location
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+            permissionsToRequest.add(Manifest.permission.ACCESS_COARSE_LOCATION)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
@@ -420,10 +436,23 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
             // All permissions already granted
             startService()
         }
+
+    }
+    private fun checkAndStartServiceIfNeeded() {
+        val hasFine = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val hasCoarse = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val hasNotification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        else true
+
+        if ((hasFine || hasCoarse) && hasNotification) {
+            startService()
+        }
     }
     override fun onResume(){
         super.onResume()
         unitPref = sharedPreferences.getString("unitPreference","0")
+//        checkAndStartServiceIfNeeded()
     }
 
     override fun onDestroy() {
