@@ -43,7 +43,7 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
     private var hasSetStartLocation = false
     private var isServiceBound = false
 
-    private lateinit var serviceIntent: Intent
+    private var serviceIntent: Intent?=null
     private lateinit var mapDisplayActivityViewModel: MapDisplayActivityViewModel
     private var calendar: Calendar = Calendar.getInstance()
     private lateinit var locationList: ArrayList<LatLng>
@@ -96,7 +96,7 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
         }
     private fun startService(){
         startService( serviceIntent)
-        applicationContext.bindService(serviceIntent, mapDisplayActivityViewModel,Context.BIND_AUTO_CREATE )
+        applicationContext.bindService(serviceIntent!!, mapDisplayActivityViewModel,Context.BIND_AUTO_CREATE )
         isServiceBound = true
     }
 
@@ -242,11 +242,11 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
             locationList = mapDisplayActivityViewModel.tempLocationList.value ?: ArrayList()
             exercise = ExerciseEntry(0L,inputTypeIndex, activityTypeIndex, calendar,duration, distance, avgPace, avgSpeed, calories, climb, heartRate, comment, locationList)
             historyViewModel.insert(exercise)
-            if (isServiceBound) {
-                applicationContext.unbindService(mapDisplayActivityViewModel)
-                isServiceBound = false
-            }
-            stopService( serviceIntent)
+//            if (isServiceBound) {
+//                applicationContext.unbindService(mapDisplayActivityViewModel)
+//                isServiceBound = false
+//            }
+//            stopService( serviceIntent)
             mapDisplayActivityViewModel.clearTempMarkers()
 
             // UPDATED: Reset markers and flags
@@ -258,11 +258,11 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
             finish()
         }
         cancelButton.setOnClickListener {
-            if (isServiceBound) {
-                applicationContext.unbindService(mapDisplayActivityViewModel)
-                isServiceBound = false
-            }
-            stopService( serviceIntent)
+//            if (isServiceBound) {
+//                applicationContext.unbindService(mapDisplayActivityViewModel)
+//                isServiceBound = false
+//            }
+//            stopService( serviceIntent)
             mapDisplayActivityViewModel.clearTempMarkers()
 
             // UPDATED: Reset markers and flags
@@ -429,13 +429,21 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
     override fun onDestroy() {
         super.onDestroy()
         if (isServiceBound) {
-            try {
-                applicationContext.unbindService(mapDisplayActivityViewModel)
-                isServiceBound = false
-            } catch (e: IllegalArgumentException) {
-                // Service was already unbound
-                e.printStackTrace()
-            }
+            applicationContext.unbindService(mapDisplayActivityViewModel)
+            isServiceBound = false
         }
+        if(serviceIntent!=null){
+            stopService( serviceIntent)
+        }
+
+//        if (isServiceBound) {
+//            try {
+//                applicationContext.unbindService(mapDisplayActivityViewModel)
+//                isServiceBound = false
+//            } catch (e: IllegalArgumentException) {
+//                // Service was already unbound
+//                e.printStackTrace()
+//            }
+//        }
     }
 }
