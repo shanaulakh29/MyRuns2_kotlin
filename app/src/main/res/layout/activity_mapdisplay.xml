@@ -3,16 +3,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    <TextView
-        android:layout_marginTop="40dp"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/map"
-        android:padding="15dp"
-        android:textSize="20sp"
-        android:textColor="@color/white"
-        android:background="@color/purple_500"
-        />
+        android:orientation="horizontal"
+        android:layout_marginTop="40dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
+        <TextView
+            android:layout_height="40dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="@string/myruns2"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
+
+        <Button
+            android:id="@+id/deleteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delete"
+            />
+
+    </LinearLayout>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -24,19 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".MainActivity" />
-        <Button
-            android:id="@+id/deleteButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:text="@string/delete"
-            android:textSize="17sp"
-            android:padding="4dp"
-            android:textColor="@color/white"
-            android:background="@color/purple_200"
-            android:layout_marginTop="40dp"
-            android:layout_marginEnd="20dp"
-            />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

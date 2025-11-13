@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 //Got idea from lecture notes about how to create database and how to connect the View to the database using repository and viewModel
-@Database(entities = [ExerciseEntry::class],version=3)
+@Database(entities = [ExerciseEntry::class],version=4)
 @TypeConverters(TypeConverter::class)
 abstract class ExerciseDatabase: RoomDatabase() {
     abstract val exerciseDatabaseDao: ExerciseDatabaseDao

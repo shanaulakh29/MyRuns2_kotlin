@@ -1,29 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory
-        android:title="Account Preferences">
+        android:title="Account Preferences"
+        app:iconSpaceReserved="false">
     <Preference
+        app:iconSpaceReserved="false"
         android:key="userProfile"
         android:title="Name, Email, Class, etc"
         android:summary="User Profile"
         />
         <Preference
+            app:iconSpaceReserved="false"
             android:layout="@layout/preference_divider" />
     <CheckBoxPreference
-
+        app:iconSpaceReserved="false"
         android:key="privacySetting"
         android:title="Privacy Setting"
         android:defaultValue="false"
         android:summary="Posting your records anonymously"
         />
     </PreferenceCategory>
-    <PreferenceCategory android:title="Additional Settings">
+    <PreferenceCategory android:title="Additional Settings"
+        app:iconSpaceReserved="false">
 <!--        <Preference-->
 <!--            android:key="unitPreference"-->
 <!--            android:title="Unit Preference"-->
 <!--            android:summary="Select the Units"-->
 <!--            />-->
         <ListPreference
+            app:iconSpaceReserved="false"
             android:key="unitPreference"
             android:title="Unit Preference"
             android:summary="Select the Units"
@@ -31,9 +37,11 @@
             android:entryValues="@array/unitValues"
             android:defaultValue="0"/>
         <Preference
+            app:iconSpaceReserved="false"
             android:layout="@layout/preference_divider"/>
 
         <EditTextPreference
+            app:iconSpaceReserved="false"
             android:key="userComment"
             android:title="Comments"
             android:summary="Please enter your comments"
@@ -41,12 +49,15 @@
             android:defaultValue=""
             />
     </PreferenceCategory>
-    <PreferenceCategory android:title="Misc.">
+    <PreferenceCategory android:title="Misc."
+        app:iconSpaceReserved="false">
         <Preference
+            app:iconSpaceReserved="false"
             android:key="webpage"
             android:title="Webpage"
             android:summary="@string/https_www_sfu_ca_computing_html"/>
         <Preference
+            app:iconSpaceReserved="false"
             android:layout="@layout/preference_divider"/>
     </PreferenceCategory>
 </androidx.preference.PreferenceScreen>

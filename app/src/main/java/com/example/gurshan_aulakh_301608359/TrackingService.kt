@@ -63,7 +63,7 @@ class TrackingService : Service(), LocationListener {
             avgSpeed = if (totalTimeHours > 0) totalDistance / totalTimeHours else 0.0
 
             // Calories burned
-            totalCalorie += deltaDistance * 0.30
+            totalCalorie += deltaDistance * 80
 
             prevLocation = location
         } else {
