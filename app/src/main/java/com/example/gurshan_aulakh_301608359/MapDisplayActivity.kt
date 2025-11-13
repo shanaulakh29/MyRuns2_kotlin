@@ -25,24 +25,24 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import java.util.Calendar
 
 class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
-    // NEW: Marker references for tracking
-    private var startMarker: Marker? = null
-    private var currentMarker: Marker? = null
-    private var hasSetStartLocation = false
-    private var polyline: Polyline?=null
     private var IS_HISTORY_MODE=true
     private var isMarkersAlreadyShownInHistoryTab=false
     private var IS_MAP_READY=false
     private var isStartLocationMarked=false
+
+    // NEW: Marker references for tracking
+    private var startMarker: Marker? = null
+    private var currentMarker: Marker? = null
+    private var hasSetStartLocation = false
+    private var isServiceBound = false
+
     private lateinit var serviceIntent: Intent
     private lateinit var mapDisplayActivityViewModel: MapDisplayActivityViewModel
     private var calendar: Calendar = Calendar.getInstance()
@@ -97,6 +97,7 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
     private fun startService(){
         startService( serviceIntent)
         applicationContext.bindService(serviceIntent, mapDisplayActivityViewModel,Context.BIND_AUTO_CREATE )
+        isServiceBound = true
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -159,7 +160,7 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
         }
 
         mapDisplayActivityViewModel.distance.observe(this){
-            dist->
+                dist->
             setDistanceTextViewValue(dist)
         }
         mapDisplayActivityViewModel.curSpeed.observe(this){
@@ -180,27 +181,28 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
             duration = time
         }
     }
+
+    // UPDATED: Only show START marker once and move CURRENT marker
     private fun showTempLocationListMarkers() {
-        if(tempLocationList.size==0){
+        if(tempLocationList.size <= 0) {
             return
         }
+
         // Only set start marker once
         if (!hasSetStartLocation) {
             val startLatlng = tempLocationList[0]
-            if(tempLocationList.size==1){
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startLatlng, 16f))
-            }
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startLatlng, 16f))
             startMarker = mMap.addMarker(
                 MarkerOptions()
                     .position(startLatlng)
                     .title("Start Location")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
             )
             hasSetStartLocation = true
             println("START MARKER CREATED AT: $startLatlng")
         }
+
+        // Update current location marker and polyline
         if (tempLocationList.size > 1) {
-            polyline?.remove()
             val currentLatlng = tempLocationList[tempLocationList.size - 1]
 
             // Remove old current marker
@@ -212,38 +214,26 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
                     .position(currentLatlng)
                     .title("Current Location")
             )
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatlng, 16f))
 
             println("CURRENT MARKER UPDATED AT: $currentLatlng")
             println("TEMPLOCATION_LIST_SIZE IS ${tempLocationList.size}")
 
             // Draw polyline ONLY between start and current position
             val startLatlng = tempLocationList[0]
-            polyline = mMap.addPolyline(PolylineOptions()
-                .addAll(tempLocationList)
+            val polylineOptions = PolylineOptions()
+                .add(startLatlng)
+                .add(currentLatlng)
                 .color(Color.BLUE)
-                .width(5f))
-        }
+                .width(5f)
 
-//        mMap.clear()
-//        val startLatlng = tempLocationList[0]
-//        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startLatlng, 16f))
-//        mMap.addMarker(MarkerOptions().position(startLatlng).title("Start Location"))
-//        println("TEMPLOCATION_LIST_SIZE IS "+tempLocationList.size)
-//        if (tempLocationList.size > 1) {
-//            for (i in 1 until tempLocationList.size) {
-//                mMap.addMarker(MarkerOptions().position(tempLocationList[i]))
-//                val polylineOptions = PolylineOptions()
-//                    .add(startLatlng)
-//                    .add(tempLocationList[i])
-//                    .color(Color.BLUE).width(5f)
-//                mMap.addPolyline(polylineOptions)
-//            }
-//        }
+            mMap.addPolyline(polylineOptions)
+        }
     }
 
+    // UPDATED: Always add location to track the path
     private fun updateCurrentLocationOnMap(loc: Location){
-        val latlng = LatLng(loc.latitude,loc.longitude)
+        val latlng = LatLng(loc.latitude, loc.longitude)
+        // Always add to temp list so we build the path
         mapDisplayActivityViewModel.addTempMarker(latlng)
     }
 
@@ -252,20 +242,35 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
             locationList = mapDisplayActivityViewModel.tempLocationList.value ?: ArrayList()
             exercise = ExerciseEntry(0L,inputTypeIndex, activityTypeIndex, calendar,duration, distance, avgPace, avgSpeed, calories, climb, heartRate, comment, locationList)
             historyViewModel.insert(exercise)
-            applicationContext.unbindService(mapDisplayActivityViewModel)
+            if (isServiceBound) {
+                applicationContext.unbindService(mapDisplayActivityViewModel)
+                isServiceBound = false
+            }
             stopService( serviceIntent)
             mapDisplayActivityViewModel.clearTempMarkers()
+
             // UPDATED: Reset markers and flags
             startMarker = null
             currentMarker = null
             hasSetStartLocation = false
             isStartLocationMarked = false
+
             finish()
         }
         cancelButton.setOnClickListener {
-            applicationContext.unbindService(mapDisplayActivityViewModel)
+            if (isServiceBound) {
+                applicationContext.unbindService(mapDisplayActivityViewModel)
+                isServiceBound = false
+            }
             stopService( serviceIntent)
             mapDisplayActivityViewModel.clearTempMarkers()
+
+            // UPDATED: Reset markers and flags
+            startMarker = null
+            currentMarker = null
+            hasSetStartLocation = false
+            isStartLocationMarked = false
+
             finish()
         }
         deleteButton.setOnClickListener {
@@ -275,6 +280,7 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
             finish()
         }
     }
+
     private fun initializeTextViews(activityType:String){
         typeTextView = findViewById<TextView>(R.id.typeValue)
         avgSpeedTextView = findViewById(R.id.avgSpeedValue)
@@ -303,8 +309,6 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
     override fun onMapReady(googeMap: GoogleMap) {
         mMap = googeMap
         mMap.mapType= GoogleMap.MAP_TYPE_NORMAL
-//        mMap.setOnMapClickListener(this)
-//        mMap.setOnMapLongClickListener(this)
         IS_MAP_READY=true
         if(!IS_HISTORY_MODE){
             showTempLocationListMarkers()
@@ -314,16 +318,6 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
             showLocationListMarkers()
         }
     }
-
-//    override fun onMapClick(p0: LatLng) {
-//        if (IS_HISTORY_MODE) return
-//    }
-
-//    override fun onMapLongClick(latlng: LatLng) {
-//        if (IS_HISTORY_MODE) return
-//        mapDisplayActivityViewModel.addTempMarker(latlng)
-//
-//    }
 
     private fun initializeVariablesFromDatabase() {
         if(id>=0){
@@ -356,15 +350,18 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
         println("LOCATIONLIST SIZE IN HISTORY MODE IS"+locationList.size)
         val startLatlng = locationList[0]
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startLatlng, 16f))
-        mMap.addMarker(MarkerOptions().position(startLatlng).title("Start").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
+        mMap.addMarker(MarkerOptions().position(startLatlng).title("Start"))
 
         if (locationList.size > 1) {
             val endLatlng = locationList[locationList.size - 1]
             mMap.addMarker(MarkerOptions().position(endLatlng).title("End"))
-            polyline = mMap.addPolyline(PolylineOptions()
-                .addAll(locationList)
+
+            val polylineOptions = PolylineOptions()
+                .add(startLatlng)
+                .add(endLatlng)
                 .color(Color.BLUE)
-                .width(5f))
+                .width(5f)
+            mMap.addPolyline(polylineOptions)
             isMarkersAlreadyShownInHistoryTab=true
         }
     }
@@ -379,7 +376,6 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
         }
 
         avgSpeed = speed
-        speed = String.format("%.2f", speed).toDouble()
         avgSpeedTextView.text = "${speed} ${unit}"
     }
     private fun setCurSpeedTextViewValue(speedParam:Double) {
@@ -390,7 +386,6 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
             speed  = speed*1.60934
         }
         curSpeed = speed
-        speed = String.format("%.2f", speed).toDouble()
         curSpeedTextView.text = "${speed} ${unit}"
     }
     private fun setDistanceTextViewValue(distParam:Double) {
@@ -402,7 +397,6 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
         }
 
         distance = dist
-        dist = String.format("%.2f", dist).toDouble()
         distanceTextView.text = "${dist} ${unit}"
     }
 
@@ -432,6 +426,16 @@ class MapDisplayActivity: AppCompatActivity() , OnMapReadyCallback{
         unitPref = sharedPreferences.getString("unitPreference","0")
     }
 
-
+    override fun onDestroy() {
+        super.onDestroy()
+        if (isServiceBound) {
+            try {
+                applicationContext.unbindService(mapDisplayActivityViewModel)
+                isServiceBound = false
+            } catch (e: IllegalArgumentException) {
+                // Service was already unbound
+                e.printStackTrace()
+            }
+        }
+    }
 }
-

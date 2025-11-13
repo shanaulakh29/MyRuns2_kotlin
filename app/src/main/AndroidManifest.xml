@@ -21,9 +21,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyRuns2">
         <service
-            android:name=".TrackingService"
-            android:enabled="true"
-            android:exported="true"></service>
+            android:name=".TrackingService" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

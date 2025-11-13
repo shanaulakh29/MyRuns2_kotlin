@@ -2,6 +2,7 @@ package com.example.gurshan_aulakh_301608359
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -119,9 +120,15 @@ class TrackingService : Service(), LocationListener {
         notificationManager.cancel(NOTIFICATION_ID)
     }
     private fun showNotification() {
+        val intent = Intent(this, MapDisplayActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        val pendingIntent = PendingIntent.getActivity(
+            this,0,intent,PendingIntent.FLAG_IMMUTABLE
+        )
         val notificationBuilder: NotificationCompat.Builder =
             NotificationCompat.Builder(this, CHANNEL_ID)
         notificationBuilder.setSmallIcon(R.drawable.notification_icon)
+        notificationBuilder.setContentIntent(pendingIntent)
         notificationBuilder.setContentTitle("Tracking Service Started😀")
         notificationBuilder.setContentText("")
         val notification = notificationBuilder.build()
